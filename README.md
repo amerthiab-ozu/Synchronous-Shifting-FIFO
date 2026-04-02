@@ -13,26 +13,26 @@
 
 ---
 
-## 📋 Table of Contents
+## Table of Contents
 
-- [Overview](#-overview)
-- [Architecture](#-architecture)
-- [Features](#-features)
-- [Interface](#-interface)
-- [Parameters](#-parameters)
-- [Theory of Operation](#-theory-of-operation)
-- [File Structure](#-file-structure)
-- [Simulation](#-simulation)
-- [Synthesis Notes](#-synthesis-notes)
-- [Waveform Examples](#-waveform-examples)
-- [Known Limitations](#-known-limitations)
-- [References](#-references)
-- [Academic Context](#-academic-context)
-- [License](#-license)
+- [Overview](#overview)
+- [Architecture](#architecture)
+- [Features](#features)
+- [Interface](#interface)
+- [Parameters](#parameters)
+- [Theory of Operation](#theory-of-operation)
+- [File Structure](#file-structure)
+- [Simulation](#simulation)
+- [Synthesis Notes](#synthesis-notes)
+- [Waveform Examples](#waveform-examples)
+- [Known Limitations](#known-limitations)
+- [References](#references)
+- [Academic Context](#academic-context)
+- [License](#license)
 
 ---
 
-## 🔍 Overview
+## Overview
 
 This project implements a **synchronous shifting FIFO (First-In-First-Out)** buffer using the classic shifting register architecture. Unlike pointer-based circular buffer FIFOs, this design physically shifts all stored data toward the output on every pop operation, maintaining the oldest entry always at position `mem[0]`.
 
@@ -50,7 +50,7 @@ The shifting FIFO architecture is particularly useful for educational purposes a
 
 ---
 
-## 🏗 Architecture
+## Architecture
 
 ```
                     ┌─────────────────────────────────────────────────────┐
@@ -95,7 +95,7 @@ The shifting FIFO architecture is particularly useful for educational purposes a
 
 ---
 
-## ✨ Features
+## Features
 
 - **Fully Synthesizable**: Clean RTL suitable for ASIC and FPGA implementation
 - **Parameterized Design**: Configurable depth (`N`) and data width (`BW`)
@@ -106,7 +106,7 @@ The shifting FIFO architecture is particularly useful for educational purposes a
 
 ---
 
-## 🔌 Interface
+## Interface
 
 ### Port Description
 
@@ -143,7 +143,7 @@ data_out════════════════════════
 
 ---
 
-## ⚙ Parameters
+## Parameters
 
 | Parameter | Default | Description |
 |-----------|---------|-------------|
@@ -176,7 +176,7 @@ shifting_fifo #(
 
 ---
 
-## 📖 Theory of Operation
+## Theory of Operation
 
 ### Push Operation
 
@@ -230,25 +230,38 @@ When both `push` and `pop` are asserted:
 
 ---
 
-## 📁 File Structure
+## File Structure
 
 ```
 Synchronous-Shifting-FIFO/
-├── README.md               # This documentation
-├── shifting_fifo.v         # RTL source - synthesizable FIFO module
-└── tb_shifting_fifo.v      # Testbench with directed tests
+├── README.md              # This documentation
+├── shifting_fifo.v        # RTL source - synthesizable FIFO module
+└── tb_shifting_fifo.v     # Testbench with directed tests
 ```
+
+This project was originally developed and tested using **AMD Xilinx Vivado 2024.2**. The source files are provided as plain Verilog-2001 to allow users to integrate them into any EDA tool of their choice, including but not limited to:
+
+- AMD Xilinx Vivado
+- Intel Quartus Prime
+- Synopsys VCS / Design Compiler
+- Cadence Xcelium / Genus
+- Mentor ModelSim / QuestaSim
+- Icarus Verilog (open-source)
+- Verilator (open-source)
 
 ---
 
-## 🧪 Simulation
+## Simulation
 
 ### Prerequisites
 
-- **Icarus Verilog** (iverilog) or any Verilog-2001 compatible simulator
-- **GTKWave** (optional, for waveform viewing)
+Any Verilog-2001 compatible simulator. Examples:
 
-### Running the Testbench
+- **Vivado Simulator** (XSim) - included with Vivado
+- **Icarus Verilog** (iverilog) - free and open-source
+- **ModelSim / QuestaSim**
+
+### Running the Testbench (Icarus Verilog)
 
 ```bash
 # Compile
@@ -260,6 +273,13 @@ vvp sim_fifo
 # View waveforms (if $dumpfile is enabled in testbench)
 gtkwave dump.vcd &
 ```
+
+### Running the Testbench (Vivado)
+
+1. Create a new project in Vivado
+2. Add `shifting_fifo.v` as a design source
+3. Add `tb_shifting_fifo.v` as a simulation source
+4. Run Behavioral Simulation
 
 ### Expected Output
 
@@ -292,13 +312,13 @@ Final Result: Pass
 
 | Section | Description | Checks |
 |---------|-------------|--------|
-| **1) Full Fill** | Reset → Fill FIFO completely | Empty/Full flag transitions, push operations |
-| **2) Full Drain** | Drain FIFO completely → Empty | Data ordering (FIFO behavior), flag transitions |
+| **1) Full Fill** | Reset, then fill FIFO completely | Empty/Full flag transitions, push operations |
+| **2) Full Drain** | Drain FIFO completely to empty | Data ordering (FIFO behavior), flag transitions |
 | **3) Simultaneous Push/Pop** | Push and Pop together while full | Flag stability, data integrity |
 
 ---
 
-## 🔧 Synthesis Notes
+## Synthesis Notes
 
 ### Resource Estimates
 
@@ -312,7 +332,7 @@ For a typical FPGA implementation with `N=32` and `BW=8`:
 
 ### Timing Considerations
 
-⚠️ **Critical Path Warning**: The shifting operation creates a combinational path through all N memory locations. For large N values, this may limit maximum clock frequency.
+**Critical Path Warning**: The shifting operation creates a combinational path through all N memory locations. For large N values, this may limit maximum clock frequency.
 
 **Recommendations**:
 - For high-speed applications with large depths, consider a **circular buffer FIFO** instead
@@ -325,7 +345,7 @@ This is a **single clock domain** design. For cross-clock-domain applications, u
 
 ---
 
-## 📊 Waveform Examples
+## Waveform Examples
 
 ### Basic Push/Pop Sequence
 
@@ -345,7 +365,7 @@ wptr:       0 |  0  |  1 |  1  |  2  |  1  |  0
 
 ---
 
-## ⚠ Known Limitations
+## Known Limitations
 
 1. **Shift Latency**: On pop, all entries must shift, creating O(N) logic depth
 2. **Power Consumption**: Higher dynamic power due to shifting all registers
@@ -355,7 +375,7 @@ wptr:       0 |  0  |  1 |  1  |  2  |  1  |  0
 
 ---
 
-## 📚 References
+## References
 
 1. Cummings, Clifford E. "Simulation and Synthesis Techniques for Asynchronous FIFO Design." SNUG 2002.
 2. Pong P. Chu, "FPGA Prototyping by Verilog Examples," Wiley, 2008.
@@ -363,34 +383,15 @@ wptr:       0 |  0  |  1 |  1  |  2  |  1  |  0
 
 ---
 
-## 🎓 Academic Context
+## Academic Context
 
-<table>
-<tr>
-<td><b>Institution</b></td>
-<td>Özyeğin University</td>
-</tr>
-<tr>
-<td><b>Department</b></td>
-<td>Electrical and Electronics Engineering</td>
-</tr>
-<tr>
-<td><b>Course</b></td>
-<td>EE568 - Hardware Design Patterns</td>
-</tr>
-<tr>
-<td><b>Instructor</b></td>
-<td>Prof. H. Fatih Uğurdağ</td>
-</tr>
-<tr>
-<td><b>Teaching Assistant</b></td>
-<td>Amer Dyab (<a href="mailto:amer.thiab@ozu.edu.tr">amer.thiab@ozu.edu.tr</a>)</td>
-</tr>
-</table>
+This work is part of the **EE568 Hardware Design Patterns** course offered by the Department of Electrical and Electronics Engineering at Özyeğin University, Istanbul, Turkey. The course is taught by **Prof. H. Fatih Uğurdağ**, with **Amer Dyab** serving as Teaching Assistant. The course focuses on reusable and synthesizable hardware design patterns commonly encountered in digital system design, covering topics such as synchronous FIFOs, state machines, memory interfaces, and arithmetic units.
+
+For questions or feedback regarding this project, please contact: amer.thiab@ozu.edu.tr
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the **MIT License**.
 
